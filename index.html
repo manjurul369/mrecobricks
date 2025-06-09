@@ -10,6 +10,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="icon" type="image/x-icon" href="Logo-ico.png">
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@100..900&family=Palanquin:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@100..900&family=Palanquin:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         *{
             scroll-behavior: smooth;
@@ -60,6 +62,106 @@
             opacity: 1;
             transform: translateY(0);
         }
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
+        }
+        .modal.open {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background-color: #FDFBF5; /* Matches body background */
+            padding: 1.5rem;
+            border-radius: 0.75rem; /* rounded-xl */
+            max-width: 90%;
+            max-height: 90%;
+            overflow-y: auto;
+            position: relative;
+            transform: scale(0.95);
+            transition: transform 0.3s ease-out;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        .modal.open .modal-content {
+            transform: scale(1);
+        }
+        .close-button {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #E07A5F; /* text-secondary */
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+        }
+        .close-button:hover {
+            background-color: rgba(224, 122, 95, 0.1); /* light hover for secondary color */
+        }
+        /* Image gallery navigation buttons */
+        .gallery-nav-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px; /* rounded-full */
+            cursor: pointer;
+            z-index: 10;
+            opacity: 0.8;
+            transition: opacity 0.2s, background-color 0.2s;
+        }
+        .gallery-nav-button:hover {
+            opacity: 1;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+        .gallery-nav-button.prev {
+            left: 0.5rem;
+        }
+        .gallery-nav-button.next {
+            right: 0.5rem;
+        }
+        .gallery-image {
+            width: 100%;
+            height: auto;
+            max-height: 400px; /* Limit height of images in gallery */
+            object-fit: contain; /* Ensure image fits without cropping */
+            border-radius: 0.5rem; /* rounded-lg */
+        }
+        /* Thubmnail scroll */
+        .thumbnail-container::-webkit-scrollbar {
+            height: 8px; /* Height of horizontal scrollbar */
+        }
+
+        .thumbnail-container::-webkit-scrollbar-track {
+            background: #f1f1f1; /* Color of the scrollbar track */
+            border-radius: 10px;
+        }
+
+        .thumbnail-container::-webkit-scrollbar-thumb {
+            background: #888; /* Color of the scrollbar thumb */
+            border-radius: 10px;
+        }
+
+        .thumbnail-container::-webkit-scrollbar-thumb:hover {
+            background: #555; /* Color of the scrollbar thumb on hover */
+        }
     </style>
 </head>
 <body class="bg-base text-dark antialiased">
@@ -67,27 +169,27 @@
     <header id="header" class="bg-primary/10 backdrop-blur-sm sticky top-0 z-50 transition-shadow duration-300">
         <nav class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div class="flex items-center justify-between">
-                <img src="Logo.png" alt="MR Eco Bricks" class="h-10 md:h-12 w-auto object-contain">
-                <div class="hidden md:flex items-center space-x-6">
+                <img src="Logo.png" alt="MR Eco Bricks" class="h-16 md:h-20 xl:h-32 w-auto object-contain">
+                <div class="hidden lg:flex items-center space-x-6">
                     <a data-target="home" class="nav-link font-medium pb-1">সূচনা</a>
+                    <a data-target="other-products" class="nav-link font-medium pb-1">সকল পণ্য</a>
                     <a data-target="products" class="nav-link font-medium pb-1">পণ্য পরিচিতি</a>
                     <a data-target="comparison" class="nav-link font-medium pb-1">তুলনামূলক বিশ্লেষণ</a>
-                    <a data-target="opportunity" class="nav-link font-medium pb-1">ব্যবসায়িক সুযোগ</a>
+                    <a data-target="opportunity" class="nav-link font-medium pb-1">ব্যবসায়িক সুযোগ</a>
                     <a data-target="recommendations" class="nav-link font-medium pb-1">সুপারিশসমূহ</a>
-                    <a data-target="other-products" class="nav-link font-medium pb-1">সকল পণ্য</a>
                 </div>
-                <a href="#contact" class="hidden md:inline-block bg-secondary text-white font-bold py-2 px-4 rounded-lg hover:bg-opacity-90 transition-colors">যোগাযোগ</a>
-                 <button id="mobile-menu-button" class="md:hidden p-2 rounded-md">
+                <a href="#contact" class="hidden lg:inline-block bg-secondary text-white font-bold py-2 px-4 rounded-lg hover:bg-opacity-90 transition-colors">যোগাযোগ</a>
+                <button id="mobile-menu-button" class="lg:hidden p-2 rounded-md">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
                 </button>
             </div>
-             <div id="mobile-menu" class="hidden md:hidden mt-4">
+            <div id="mobile-menu" class="hidden lg:hidden mt-4">
                 <a data-target="home" class="block py-2 px-3 rounded nav-link">সূচনা</a>
+                <a data-target="other-products" class="block py-2 px-3 rounded nav-link">সকল পণ্য</a>
                 <a data-target="products" class="block py-2 px-3 rounded nav-link">পণ্য পরিচিতি</a>
                 <a data-target="comparison" class="block py-2 px-3 rounded nav-link">তুলনামূলক বিশ্লেষণ</a>
-                <a data-target="opportunity" class="block py-2 px-3 rounded nav-link">ব্যবসায়িক সুযোগ</a>
+                <a data-target="opportunity" class="block py-2 px-3 rounded nav-link">ব্যবসায়িক সুযোগ</a>
                 <a data-target="recommendations" class="block py-2 px-3 rounded nav-link">সুপারিশসমূহ</a>
-                <a data-target="other-products" class="block py-2 px-3 rounded nav-link">সকল পণ্য</a>
                 <a href="#contact" class="block bg-secondary text-white text-center font-bold py-2 px-3 rounded-lg mt-2">যোগাযোগ</a>
             </div>
         </nav>
@@ -97,28 +199,43 @@
         
         <section id="home" class="min-h-[60vh] flex items-center justify-center text-center py-20 section-fade-in">
             <div>
+                <h2 class="text-4xl md:text-6xl font-[Palanquin] font-bold text-[#5996F7] mb-2 md:mb-6 leading-tight">MR Eco Bricks and Machineries</h2>
                 <h2 class="text-4xl md:text-6xl font-extrabold text-dark leading-tight">
                     নির্মাণের <span class="text-primary">ভবিষ্যৎ</span>, পরিবেশবান্ধব <span class="text-secondary">সমাধান</span>
                 </h2>
                 <p class="mt-6 max-w-3xl mx-auto text-lg md:text-xl text-dark/80">
-                    এম আর ইকো ব্রিকস অ্যান্ড মেশিনারি প্রচলিত পোড়া ইটের একটি শক্তিশালী, সাশ্রয়ী এবং পরিবেশবান্ধব বিকল্প প্রদান করছে। আধুনিক নির্মাণ প্রযুক্তির সাথে তাল মিলিয়ে আপনার স্বপ্নের বাড়ি তৈরি করুন।
+                    এম আর ইকো ব্রিকস অ্যান্ড মেশিনারি প্রচলিত পোড়া ইটের একটি শক্তিশালী, সাশ্রয়ী এবং পরিবেশবান্ধব বিকল্প প্রদান করছে। আধুনিক নির্মাণ প্রযুক্তির সাথে তাল মিলিয়ে আপনার স্বপ্নের বাড়ি তৈরি করুন।
                 </p>
                 <div class="mt-10">
-                    <a href="#products" class="bg-primary text-white font-bold text-lg py-3 px-8 rounded-lg hover:bg-opacity-90 transition-colors shadow-lg">আমাদের পণ্য দেখুন</a>
+                    <a href="#other-products" class="bg-primary text-white font-bold text-lg py-3 px-8 rounded-lg hover:bg-opacity-90 transition-colors shadow-lg">আমাদের পণ্য দেখুন</a>
                 </div>
             </div>
         </section>
 
+        <section id="other-products" class="pt-5 pb-20 bg-base rounded-2xl section-fade-in">
+            <div class="text-center mb-12">
+                <h3 class="text-3xl md:text-4xl font-bold text-dark">আমাদের সকল পণ্য</h3>
+                <p class="mt-4 max-w-2xl mx-auto text-lg text-dark/70">আমাদের বিভিন্ন ক্যাটাগরির পণ্যগুলো এখানে দেখুন।</p>
+                <div class="mt-6 flex flex-wrap justify-center gap-3">
+                    <button data-category="all" class="product-filter-btn active bg-secondary text-white font-semibold py-2 px-5 rounded-lg">সকল পণ্য</button>
+                    <button data-category="solid-bricks" class="product-filter-btn bg-gray-200 text-gray-700 font-semibold py-2 px-5 rounded-lg">সলিড ব্রিক্স</button>
+                    <button data-category="hollow-blocks" class="product-filter-btn bg-gray-200 text-gray-700 font-semibold py-2 px-5 rounded-lg">হলো ব্লক</button>
+                    <button data-category="others" class="product-filter-btn bg-gray-200 text-gray-700 font-semibold py-2 px-5 rounded-lg">অন্যান্য</button>
+                </div>
+            </div>
+            <div id="product-gallery" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+        </section>
+
         <section class="py-20 section-fade-in">
              <div class="text-center mb-12">
-                <h3 class="text-3xl md:text-4xl font-bold text-dark">কেন প্রচলিত ইটের বিকল্প প্রয়োজন?</h3>
+                <h3 class="text-3xl md:text-4xl font-bold text-dark">কেন প্রচলিত ইটের বিকল্প প্রয়োজন?</h3>
                 <p class="mt-4 max-w-2xl mx-auto text-lg text-dark/70">প্রচলিত ইটের ভাটা পরিবেশের উপর মারাত্মক ক্ষতিকর প্রভাব ফেলে।</p>
             </div>
             <div class="grid md:grid-cols-3 gap-8 text-center">
                 <div class="bg-white p-8 rounded-xl shadow-md border border-gray-100">
                     <div class="text-5xl mb-4 text-secondary">💨</div>
-                    <h4 class="text-xl font-bold mb-2">বায়ু দূষণ</h4>
-                    <p class="text-dark/70">ইটের ভাটা থেকে নির্গত কালো ধোঁয়া বায়ুর গুণমান নষ্ট করে এবং জনস্বাস্থ্যের জন্য হুমকি।</p>
+                    <h4 class="text-xl font-bold mb-2">বায়ু দূষণ</h4>
+                    <p class="text-dark/70">ইটের ভাটা থেকে নির্গত কালো ধোঁয়া বায়ুর গুণমান নষ্ট করে এবং জনস্বাস্থ্যের জন্য হুমকি।</p>
                 </div>
                 <div class="bg-white p-8 rounded-xl shadow-md border border-gray-100">
                      <div class="text-5xl mb-4 text-accent">🌱</div>
@@ -128,7 +245,7 @@
                  <div class="bg-white p-8 rounded-xl shadow-md border border-gray-100">
                     <div class="text-5xl mb-4 text-primary">💰</div>
                     <h4 class="text-xl font-bold mb-2">অতিরিক্ত খরচ</h4>
-                    <p class="text-dark/70">জ্বালানির দাম বৃদ্ধি এবং অদক্ষ পদ্ধতির কারণে পোড়া ইটের উৎপাদন খরচ দিন দিন বাড়ছে।</p>
+                    <p class="text-dark/70">জ্বালানির দাম বৃদ্ধি এবং অদক্ষ পদ্ধতির কারণে পোড়া ইটের উৎপাদন খরচ দিন দিন বাড়ছে।</p>
                 </div>
             </div>
         </section>
@@ -172,18 +289,22 @@
                 <p class="mt-4 max-w-2xl mx-auto text-lg text-dark/70">আমাদের মেশিনারি ও ফরমা ব্যবহার করে নিজেই শুরু করুন পরিবেশবান্ধব ইট তৈরির ব্যবসা।</p>
             </div>
             <div class="grid md:grid-cols-2 gap-8 text-center">
-                 <div class="bg-white p-8 rounded-xl shadow-md border border-gray-100">
-                    <div class="text-5xl mb-4">🧱</div>
+                <div class="bg-white p-8 rounded-xl shadow-md border border-gray-100">
+                    <div class="flex justify-center items-center mb-4">
+                        <img src="Solid Bricks.jpg" alt="Solid Brick Icon" class="w-24 h-24 object-cover">
+                    </div>
                     <h4 class="text-xl font-bold mb-2">সলিড ব্রিক্সের ফরমা</h4>
-                    <p class="text-dark/70">এক পিস থেকে শুরু করে ৪ পিস পর্যন্ত সলিড ব্রিক্স তৈরির হ্যান্ড ফরমা/ডাইস পাওয়া যায়।</p>
+                    <p class="text-dark/70">এক পিস থেকে শুরু করে ৪ পিস পর্যন্ত সলিড ব্রিক্স তৈরির হ্যান্ড ফরমা/ডাইস পাওয়া যায়।</p>
                 </div>
                 <div class="bg-white p-8 rounded-xl shadow-md border border-gray-100">
-                     <div class="text-5xl mb-4">🧊</div>
+                    <div class="flex justify-center items-center mb-4">
+                        <img src="Hollow Block.png" alt="Hollow Block Icon" class="w-24 h-24 object-cover">
+                    </div>
                     <h4 class="text-xl font-bold mb-2">হলো ব্লকের ফরমা</h4>
-                    <p class="text-dark/70">এক পিস এবং ২ পিসের হলো ব্লক তৈরির জন্য বিশেষ ডাইস/ফরমা সরবরাহ করা হয়।</p>
+                    <p class="text-dark/70">এক পিস এবং ২ পিসের হলো ব্লক তৈরির জন্য বিশেষ ডাইস/ফরমা সরবরাহ করা হয়।</p>
                 </div>
             </div>
-            <p class="text-center mt-8 text-dark/80">আমরা সারা বাংলাদেশে কুরিয়ার সার্ভিসের মাধ্যমে আপনার ঠিকানায় পণ্য পৌঁছে দিই।</p>
+            <p class="text-center mt-8 font-bold text-dark/80">আমরা সারা বাংলাদেশে কুরিয়ার সার্ভিসের মাধ্যমে আপনার ঠিকানায় পণ্য পৌঁছে দিই।</p>
         </section>
         
         <section id="recommendations" class="py-20 section-fade-in">
@@ -195,17 +316,17 @@
                 <div class="swot-card bg-green-100 p-6 rounded-lg">
                     <h4 class="text-2xl font-bold text-green-800 mb-3">শক্তি (Strengths)</h4>
                     <ul class="list-disc list-inside space-y-2 text-green-700">
-                        <li>পরিবেশবান্ধব ও সাশ্রয়ী পণ্য।</li>
-                        <li>প্রচলিত ইটের চেয়ে দ্বিগুণ মজবুত।</li>
-                        <li>দ্বৈত ব্যবসায়িক মডেল (পণ্য ও মেশিনারি বিক্রয়)।</li>
-                        <li>নতুন উদ্যোক্তা তৈরিতে সহায়তা।</li>
+                        <li>পরিবেশবান্ধব ও সাশ্রয়ী পণ্য।</li>
+                        <li>প্রচলিত ইটের চেয়ে দ্বিগুণ মজবুত।</li>
+                        <li>দ্বৈত ব্যবসায়িক মডেল (পণ্য ও মেশিনারি বিক্রয়)।</li>
+                        <li>নতুন উদ্যোক্তা তৈরিতে সহায়তা।</li>
                     </ul>
                 </div>
                 <div class="swot-card bg-blue-100 p-6 rounded-lg">
                     <h4 class="text-2xl font-bold text-blue-800 mb-3">সুযোগ (Opportunities)</h4>
                     <ul class="list-disc list-inside space-y-2 text-blue-700">
                         <li>পরিবেশবান্ধব সামগ্রীর ক্রমবর্ধমান বাজার।</li>
-                        <li>সরকারি নীতি ও সহায়তার সম্ভাবনা।</li>
+                        <li>সরকারি নীতি ও সহায়তার সম্ভাবনা।</li>
                         <li>পেশাদার অনলাইন উপস্থিতি তৈরির মাধ্যমে ব্র্যান্ড ইমেজ বৃদ্ধি।</li>
                         <li>পণ্যের মান সনদ অর্জনের মাধ্যমে বিশ্বাসযোগ্যতা বৃদ্ধি।</li>
                     </ul>
@@ -213,26 +334,31 @@
             </div>
         </section>
 
-        <section id="other-products" class="py-20 bg-base rounded-2xl section-fade-in">
-            <div class="text-center mb-12">
-                <h3 class="text-3xl md:text-4xl font-bold text-dark">আমাদের সকল পণ্য</h3>
-                <p class="mt-4 max-w-2xl mx-auto text-lg text-dark/70">আমাদের বিভিন্ন ক্যাটাগরির পণ্যগুলো এখানে দেখুন।</p>
-                <div class="mt-6 flex flex-wrap justify-center gap-3">
-                    <button data-category="all" class="product-filter-btn active bg-secondary text-white font-semibold py-2 px-5 rounded-lg">সকল পণ্য</button>
-                    <button data-category="solid-bricks" class="product-filter-btn bg-gray-200 text-gray-700 font-semibold py-2 px-5 rounded-lg">সলিড ব্রিক্স</button>
-                    <button data-category="hollow-blocks" class="product-filter-btn bg-gray-200 text-gray-700 font-semibold py-2 px-5 rounded-lg">হলো ব্লক</button>
-                    <button data-category="others" class="product-filter-btn bg-gray-200 text-gray-700 font-semibold py-2 px-5 rounded-lg">অন্যান্য</button>
+        <section id="team" class="py-20 section-fade-in">
+            <div class="text-center mb-5">
+                <h3 class="text-3xl md:text-4xl font-bold text-dark">আমাদের পরিচিতি</h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-center">
+                <!-- MD. Munna Sarker -->
+                <div class="bg-white p-8 rounded-xl shadow-md border border-gray-100 flex flex-col items-center">
+                    <img src="Munna.jpg" alt="MD. Munna Sarker" class="w-36 h-36 rounded-full object-cover mb-4 shadow-lg">
+                    <h4 class="text-2xl font-bold text-dark mb-1">মোঃ মুন্না সরকার</h4>
+                    <p class="text-primary text-lg font-medium">প্রতিষ্ঠাতা ও সিইও</p>
+                </div>
+                <!-- MD. Manjurul Islam -->
+                <div class="bg-white p-8 rounded-xl shadow-md border border-gray-100 flex flex-col items-center">
+                    <img src="Manjurul.jpg" alt="MD. Manjurul Islam" class="w-36 h-36 rounded-full object-cover mb-4 shadow-lg">
+                    <h4 class="text-2xl font-bold text-dark mb-1">মোঃ মঞ্জুরুল ইসলাম</h4>
+                    <p class="text-secondary text-lg font-medium">ম্যানেজার ও আইটি স্পেশালিস্ট</p>
                 </div>
             </div>
-            <div id="product-gallery" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                </div>
         </section>
 
         <section id="contact" class="text-center py-20 section-fade-in">
             <div class="bg-white p-10 rounded-2xl shadow-xl border border-gray-100">
                 <h3 class="text-3xl md:text-4xl font-bold text-dark">আপনার প্রকল্প শুরু করতে প্রস্তুত?</h3>
                 <p class="mt-4 max-w-xl mx-auto text-lg text-dark/70">
-                    আপনার বাড়ি নির্মাণের জন্য বা নতুন ব্যবসা শুরু করতে, আমাদের পণ্য ও সেবা সম্পর্কে আরও জানতে আজই যোগাযোগ করুন।
+                    আপনার বাড়ি নির্মাণের জন্য বা নতুন ব্যবসা শুরু করতে, আমাদের পণ্য ও সেবা সম্পর্কে আরও জানতে আজই যোগাযোগ করুন।
                 </p>
                 <div class="mt-8">
                     <a href="tel:01797819824" class="inline-block bg-secondary text-white font-bold text-xl py-4 px-10 rounded-lg hover:bg-opacity-90 transition-colors shadow-lg">
@@ -247,9 +373,38 @@
     <footer class="bg-primary/10 mt-20 py-8">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center text-dark/60">
             <p>&copy; ২০২৫ এম আর ইকো ব্রিকস অ্যান্ড মেশিনারি। সর্বস্বত্ব সংরক্ষিত।</p>
-            <p class="text-sm mt-2">এই ওয়েবসাইটটি একটি বিশ্লেষণমূলক প্রতিবেদনের উপর ভিত্তি করে তৈরি এবং শুধুমাত্র তথ্যমূলক উদ্দেশ্যে ব্যবহৃত।</p>
+            <p class="text-sm mt-2">এই ওয়েবসাইটটি একটি বিশ্লেষণমূলক প্রতিবেদনের উপর ভিত্তি করে তৈরি এবং শুধুমাত্র তথ্যমূলক উদ্দেশ্যে ব্যবহৃত।</p>
         </div>
     </footer>
+
+    <div id="product-modal" class="modal">
+        <div class="modal-content relative w-full h-full flex flex-col p-6 sm:p-8">
+            <button class="close-button" aria-label="Close modal">&times;</button>
+            <h3 id="modal-product-name" class="text-3xl md:text-4xl font-bold text-dark text-center mb-6"></h3>
+            
+            <div class="flex flex-col md:flex-row gap-6 md:gap-8 flex-grow">
+                <!-- Product Details -->
+                <div class="md:w-1/2 flex flex-col justify-center text-left p-4 rounded-lg bg-gray-50 shadow-inner xl:p-16">
+                    <h4 class="text-2xl font-bold text-dark mb-4">মাপ (Dimensions):</h4>
+                    <div id="modal-product-dimensions" class="space-y-2 text-xl font-bold ml-4">
+                        <!-- Dimensions will be inserted here -->
+                    </div>
+                    <p class="text-dark/70 mt-4 ml-4 text-lg">আপনার পছন্দ অনুযায়ী সাইজ কাস্টমাইজ করে নিতে পারবেন।</p>
+                </div>
+
+                <!-- Image Gallery -->
+                <div class="md:w-1/2 relative flex flex-col items-center justify-center p-4">
+                    <button id="prev-image-btn" class="gallery-nav-button prev">❮</button>
+                    <img id="modal-gallery-image" src="" alt="Product Image" class="gallery-image shadow-lg">
+                    <button id="next-image-btn" class="gallery-nav-button next">❯</button>
+                    <!-- Thumbnail navigation -->
+                    <div id="modal-thumbnails" class="thumbnail-container flex overflow-x-auto gap-2 mt-4 p-2 bg-gray-100 rounded-lg shadow-inner">
+                        <!-- Thumbnails will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -257,38 +412,139 @@
                 solid: {
                     title: "কংক্রিট সলিড ব্রিক্স",
                     imageUrl: '4 Piece Solid Brick.jpg',
-                    description: "বালি ও সিমেন্ট দিয়ে তৈরি এই ব্রিক্সগুলো প্রচলিত পোড়া ইটের একটি চমৎকার বিকল্প। মেশিনে তৈরির কারণে এর প্রতিটি ইট হয় নিখুঁত এবং মজবুত।",
+                    description: "বালি ও সিমেন্ট দিয়ে তৈরি এই ব্রিক্সগুলো প্রচলিত পোড়া ইটের একটি চমৎকার বিকল্প। মেশিনে তৈরির কারণে এর প্রতিটি ইট হয় নিখুঁত এবং মজবুত।",
                     features: [
-                        { icon: '💪', text: 'পোড়া ইটের চেয়ে দ্বিগুণ মজবুত' },
+                        { icon: '💪', text: 'পোড়া ইটের চেয়ে দ্বিগুণ মজবুত' },
                         { icon: '💰', text: 'অর্ধেক খরচে নির্মাণ সম্ভব' },
                         { icon: '🍄', text: 'ছত্রাক ও লবণাক্ততা প্রতিরোধী' },
-                        { icon: '🌡️', text: 'ঘরকে শীতল রাখতে সহায়ক' }
+                        { icon: '🌡️', text: 'ঘরকে শীতল রাখতে সহায়ক' }
+                    ],
+                    dimensions: [
+                        { label: 'লম্বা', value: '৯.৫ ইঞ্চি' },
+                        { label: 'পাশ', value: '৪.৫ ইঞ্চি' },
+                        { label: 'উচ্চতা', value: '২.৭৫ ইঞ্চি' }
                     ]
                 },
                 hollow: {
                     title: "কংক্রিট হলো ব্লক",
                     imageUrl: '2 Piece Hollow Block.jpg',
-                    description: "মাঝখানে ফাঁপা থাকায় এই ব্লকগুলো ওজনে হালকা এবং তাপ নিরোধক হিসেবে অসাধারণ কাজ করে। দ্রুত নির্মাণ কাজের জন্য এটি আদর্শ।",
+                    description: "মাঝখানে ফাঁপা থাকায় এই ব্লকগুলো ওজনে হালকা এবং তাপ নিরোধক হিসেবে অসাধারণ কাজ করে। দ্রুত নির্মাণ কাজের জন্য এটি আদর্শ।",
                     features: [
                         { icon: '⚡', text: 'দ্রুত নির্মাণ (একটি ব্লক = ৫টি ইট)' },
-                        { icon: '⚖️', text: 'ওজনে হালকা, কাঠামোর উপর চাপ কমায়' },
+                        { icon: '⚖️', text: 'ওজনে হালকা, কাঠামোর উপর চাপ কমায়' },
                         { icon: '🔥', text: 'চমৎকার তাপ ও শব্দ নিরোধক' },
                         { icon: '💸', text: 'শ্রমিক ও গাঁথুনির মশলা খরচ কম' }
+                    ],
+                    dimensions: [
+                        { label: 'লম্বা', value: '১৬ ইঞ্চি' },
+                        { label: 'উচ্চতা', value: '৮ ইঞ্চি' },
+                        { label: 'পাশ', value: '৪ ইঞ্চি' },
+                        { label: 'হলো\'র পুরুত্ত', value: '১.২৫ ইঞ্চি' }
                     ]
                 }
             };
 
             const otherProductsData = [
-                { id: 'prod1', category: 'solid-bricks', name: '১ পিস সলিড ব্রিক্স ফরমা', imageUrl: '1 Piece Solid Brick.jpg' },
-                { id: 'prod2', category: 'solid-bricks', name: '২ পিস সলিড ব্রিক্স ফরমা', imageUrl: '2 Piece Solid Brick.jpg' },
-                { id: 'prod7', category: 'solid-bricks', name: '৩ পিস সলিড ব্রিক্স ফরমা', imageUrl: '3 Piece Solid Brick.jpg' },
-                { id: 'prod3', category: 'hollow-blocks', name: '১ পিস হলো ব্লক ফরমা', imageUrl: '1 Piece Hollow Block.jpg' },
-                { id: 'prod4', category: 'hollow-blocks', name: '২ পিস হলো ব্লক ফরমা (২ ছিদ্রযুক্ত)', imageUrl: '2 Piece Hollow Block.jpg' },
-                { id: 'prod9', category: 'hollow-blocks', name: '২ পিস হলো ব্লক ফরমা (৩ ছিদ্রযুক্ত)', imageUrl: '2 Piece Hollow Block 2.jpg' },
-                { id: 'prod5', category: 'others', name: 'সেমি-অটো ব্রিক মেশিন', imageUrl: 'https://placehold.co/300x200/E07A5F/FFFFFF?text=Semi-Auto+Machine' },
-                { id: 'prod6', category: 'others', name: 'হাইড্রো ব্রিক মেশিন', imageUrl: 'Others1.jpg' },
-                { id: 'prod8', category: 'others', name: 'কংক্রিট হলো ব্লক + লিনটেল ব্লক', imageUrl: 'Others2.jpg' },
-                { id: 'prod10', category: 'others', name: '৮ ইঞ্চি হলো ব্লক', imageUrl: '1 Piece Hollow Block 8.jpg' }
+                { 
+                    id: 'prod1', category: 'solid-bricks', name: '১ পিস সলিড ব্রিক্স ফরমা', 
+                    imageUrl: '1 Piece Solid Brick.jpg', 
+                    dimensions: [
+                        { label: 'লম্বা', value: '৯.৫ ইঞ্চি' }, { label: 'পাশ', value: '৪.৫ ইঞ্চি' }, { label: 'উচ্চতা', value: '২.৭৫ ইঞ্চি' }
+                    ],
+                    images: [
+                        '1 Piece Solid Brick.jpg'
+                    ]
+                },
+                { 
+                    id: 'prod2', category: 'solid-bricks', name: '২ পিস সলিড ব্রিক্স ফরমা', 
+                    imageUrl: '2 Piece Solid Brick.jpg', 
+                    dimensions: [
+                        { label: 'লম্বা', value: '৯.৫ ইঞ্চি' }, { label: 'পাশ', value: '৪.৫ ইঞ্চি' }, { label: 'উচ্চতা', value: '২.৭৫ ইঞ্চি' }
+                    ],
+                    images: [
+                        '2 Piece Solid Brick.jpg'
+                    ]
+                },
+                { 
+                    id: 'prod7', category: 'solid-bricks', name: '৩ পিস সলিড ব্রিক্স ফরমা', 
+                    imageUrl: '3 Piece Solid Brick.jpg', 
+                    dimensions: [
+                        { label: 'লম্বা', value: '৯.৫ ইঞ্চি' }, { label: 'পাশ', value: '৪.৫ ইঞ্চি' }, { label: 'উচ্চতা', value: '২.৭৫ ইঞ্চি' }
+                    ],
+                    images: [
+                        '3 Piece Solid Brick.jpg'
+                    ]
+                },
+                { 
+                    id: 'prod3', category: 'hollow-blocks', name: '১ পিস হলো ব্লক ফরমা', 
+                    imageUrl: '1 Piece Hollow Block.jpg', 
+                    dimensions: [
+                        { label: 'লম্বা', value: '১৬ ইঞ্চি' }, { label: 'উচ্চতা', value: '৮ ইঞ্চি' }, { label: 'পাশ', value: '৪ ইঞ্চি' }, { label: 'হলো\'র পুরুত্ত', value: '১.২৫ ইঞ্চি' }
+                    ],
+                    images: [
+                        '1 Piece Hollow Block.jpg'
+                    ]
+                },
+                { 
+                    id: 'prod4', category: 'hollow-blocks', name: '২ পিস হলো ব্লক ফরমা (২ ছিদ্রযুক্ত)', 
+                    imageUrl: '2 Piece Hollow Block.jpg', 
+                    dimensions: [
+                        { label: 'লম্বা', value: '১৬ ইঞ্চি' }, { label: 'উচ্চতা', value: '৮ ইঞ্চি' }, { label: 'পাশ', value: '৪ ইঞ্চি' }, { label: 'হলো\'র পুরুত্ত', value: '১.২৫ ইঞ্চি' }
+                    ],
+                    images: [
+                        '2 Piece Hollow Block.jpg'
+                    ]
+                },
+                { 
+                    id: 'prod9', category: 'hollow-blocks', name: '২ পিস হলো ব্লক ফরমা (৩ ছিদ্রযুক্ত)', 
+                    imageUrl: '2 Piece Hollow Block 2.jpg', 
+                    dimensions: [
+                        { label: 'লম্বা', value: '১৬ ইঞ্চি' }, { label: 'উচ্চতা', value: '৮ ইঞ্চি' }, { label: 'পাশ', value: '৪ ইঞ্চি' }, { label: 'হলো\'র পুরুত্ত', value: '১.২৫ ইঞ্চি' }
+                    ],
+                    images: [
+                        '2 Piece Hollow Block 2.jpg'
+                    ]
+                },
+                { 
+                    id: 'prod10', category: 'hollow-blocks', name: '৮ ইঞ্চি হলো ব্লক', 
+                    imageUrl: '1 Piece Hollow Block 8.jpg', 
+                    dimensions: [
+                        { label: 'লম্বা', value: '৮ ইঞ্চি' }, { label: 'উচ্চতা', value: '৮ ইঞ্চি' }, { label: 'পাশ', value: '৪ ইঞ্চি' }, { label: 'হলো\'র পুরুত্ত', value: '১.২৫ ইঞ্চি' }
+                    ],
+                    images: [
+                        '1 Piece Hollow Block 8.jpg'
+                    ]
+                },
+                { 
+                    id: 'prod5', category: 'others', name: 'সেমি-অটো ব্রিক মেশিন', 
+                    imageUrl: 'https://placehold.co/300x200/E07A5F/FFFFFF?text=Semi-Auto+Machine', 
+                    dimensions: [
+                        { label: 'সলিড ব্রিক্স', value: '(৯.৫ X ৪.৫ X ২.৭৫) ইঞ্চি' }, { label: 'হলো ব্লক', value: '(১৬ X ৮ X ৪) ইঞ্চি' }
+                    ],
+                    images: [
+                        'https://placehold.co/600x400/F2CC8F/3D405B?text=Semi-Auto+Machine+Image+1'
+                    ]
+                },
+                { 
+                    id: 'prod6', category: 'others', name: 'হাইড্রো ব্রিক মেশিন', 
+                    imageUrl: 'Others1.jpg', 
+                    dimensions: [
+                        { label: 'লম্বা', value: '৯.৫ ইঞ্চি' }, { label: 'উচ্চতা', value: '৪.৫ ইঞ্চি' }, { label: 'পাশ', value: '২.৭৫ ইঞ্চি' }, { label: 'হলো\'র পুরুত্ত', value: '১.৫ ইঞ্চি' }
+                    ],
+                    images: [
+                        'Others1.jpg'
+                    ]
+                },
+                { 
+                    id: 'prod8', category: 'others', name: 'কংক্রিট হলো ব্লক + লিনটেল ব্লক', 
+                    imageUrl: 'Others2.jpg', 
+                    dimensions: [
+                        { label: 'লম্বা', value: '১৬ ইঞ্চি' }, { label: 'উচ্চতা', value: '৮ ইঞ্চি' }, { label: 'পাশ', value: '৪ ইঞ্চি' }, { label: 'হলো\'র পুরুত্ত', value: '১.২৫ ইঞ্চি' }
+                    ],
+                    images: [
+                        'Others2.jpg'
+                    ]
+                }
             ];
 
 
@@ -296,17 +552,17 @@
                 strength: {
                     label: 'মজবুতি (PSI এককে)',
                     data: [1200, 2500, 2200],
-                    explanation: 'এম আর ইকো ব্রিক্স পোড়া ইটের চেয়ে প্রায় দ্বিগুণ শক্তিশালী, যা আপনার স্থাপনাকে দেয় দীর্ঘস্থায়ী সুরক্ষা।'
+                    explanation: 'এম আর ইকো ব্রিক্স পোড়া ইটের চেয়ে প্রায় দ্বিগুণ শক্তিশালী, যা আপনার স্থাপনাকে দেয় দীর্ঘস্থায়ী সুরক্ষা।'
                 },
                 cost: {
-                    label: 'প্রতিটি ইটের গড় খরচ (টাকায়)',
+                    label: 'প্রতিটি ইটের গড় খরচ (টাকায়)',
                     data: [12, 7, 35],
-                    explanation: 'সলিড ব্রিক্স সরাসরি সাশ্রয়ী এবং হলো ব্লক আকারে বড় হওয়ায় সামগ্রিক খরচ কমে আসে।'
+                    explanation: 'সলিড ব্রিক্স সরাসরি সাশ্রয়ী এবং হলো ব্লক আকারে বড় হওয়ায় সামগ্রিক খরচ কমে আসে।'
                 },
                 speed: {
                     label: 'নির্মাণ গতি (আপেক্ষিক একক)',
                     data: [1, 1.2, 3],
-                    explanation: 'হলো ব্লকের বড় আকারের কারণে দেয়াল গাঁথুনির কাজ প্রায় ৩ গুণ দ্রুত সম্পন্ন হয়, যা শ্রমিক খরচ বাঁচায়।'
+                    explanation: 'হলো ব্লকের বড় আকারের কারণে দেয়াল গাঁথুনির কাজ প্রায় ৩ গুণ দ্রুত সম্পন্ন হয়, যা শ্রমিক খরচ বাঁচায়।'
                 },
                 insulation: {
                     label: 'তাপ নিরোধক ক্ষমতা (আপেক্ষিক একক)',
@@ -322,10 +578,10 @@
             function updateProductView(productKey) {
                 const product = productContent[productKey];
                 productContainer.innerHTML = `
-                    <div class="text-center md:text-left">
+                    <div class="text-left">
                         <h4 class="text-3xl font-bold mb-4 text-dark">${product.title}</h4>
                         <p class="text-lg text-dark/70 mb-6">${product.description}</p>
-                        <div class="space-y-4">
+                        <div class="space-y-4 mb-6">
                             ${product.features.map(feature => `
                                 <div class="flex items-center">
                                     <span class="text-2xl mr-4">${feature.icon}</span>
@@ -333,6 +589,13 @@
                                 </div>
                             `).join('')}
                         </div>
+                        <h5 class="text-xl font-bold mb-3 text-dark">মাপ (Dimensions):</h5>
+                        <div class="space-y-2 text-xl font-bold ml-4">
+                            ${product.dimensions.map(dim => `
+                                <p class="text-dark/70"><span class="font-bold">-${dim.label}:</span> ${dim.value}</p>
+                            `).join('')}
+                        </div>
+                        <p class="text-dark/70 mt-2 ml-4 text-xl">আপনার পছন্দ অনুযায়ী সাইজ কাস্টমাইজ করে নিতে পারবেন।</p>
                     </div>
                     <div class="flex items-center justify-center bg-gray-100 rounded-2xl p-8 min-h-[300px]">
                         <img src="${product.imageUrl}" alt="${product.title}" class="w-full h-auto max-h-[300px] object-contain rounded-lg">
@@ -361,7 +624,7 @@
             const comparisonChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: ['প্রচলিত পোড়া ইট', 'এম আর সলিড ব্রিক্স', 'এম আর হলো ব্লক'],
+                    labels: ['প্রচলিত পোড়া ইট', 'এম আর সলিড ব্রিক্স', 'এম আর হলো ব্লক'],
                     datasets: [{
                         label: '',
                         data: [],
@@ -467,7 +730,9 @@
                 
                 filteredProducts.forEach(product => {
                     const productCard = document.createElement('div');
-                    productCard.className = 'bg-white rounded-xl shadow-md overflow-hidden border border-gray-100';
+                    // Add data-product-id to easily retrieve product data on click
+                    productCard.className = 'bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 cursor-pointer hover:shadow-lg transition-shadow product-card-clickable';
+                    productCard.dataset.productId = product.id; // Store product ID for modal lookup
                     productCard.innerHTML = `
                         <img src="${product.imageUrl}" alt="${product.name}" class="w-full h-48 object-cover">
                         <div class="p-4">
@@ -480,6 +745,11 @@
                         </div>
                     `;
                     productGallery.appendChild(productCard);
+                });
+
+                // Add event listeners to newly created product cards
+                document.querySelectorAll('.product-card-clickable').forEach(card => {
+                    card.addEventListener('click', openProductModal);
                 });
             }
 
@@ -504,7 +774,7 @@
                     const targetId = link.getAttribute('data-target');
                     const targetElement = document.getElementById(targetId);
                     if (targetElement) {
-                         window.scrollTo({
+                        window.scrollTo({
                             top: targetElement.offsetTop - document.getElementById('header').offsetHeight,
                             behavior: 'smooth'
                         });
@@ -534,6 +804,121 @@
                 mobileMenu.classList.toggle('hidden');
             });
 
+
+            // --- Product Modal Logic ---
+            const productModal = document.getElementById('product-modal');
+            const modalProductName = document.getElementById('modal-product-name');
+            const modalProductDimensions = document.getElementById('modal-product-dimensions');
+            const modalGalleryImage = document.getElementById('modal-gallery-image');
+            const modalThumbnails = document.getElementById('modal-thumbnails');
+            const prevImageBtn = document.getElementById('prev-image-btn');
+            const nextImageBtn = document.getElementById('next-image-btn');
+            const closeButton = productModal.querySelector('.close-button');
+
+            let currentProduct = null;
+            let currentImageIndex = 0;
+
+            /**
+             * Opens the product modal and populates it with data.
+             * @param {Event} event - The click event from a product card.
+             */
+            function openProductModal(event) {
+                const productId = event.currentTarget.dataset.productId;
+                currentProduct = otherProductsData.find(p => p.id === productId);
+
+                if (!currentProduct) return; // Should not happen if IDs are correct
+
+                modalProductName.textContent = currentProduct.name;
+
+                // Populate dimensions
+                modalProductDimensions.innerHTML = '';
+                currentProduct.dimensions.forEach(dim => {
+                    const p = document.createElement('p');
+                    p.className = 'text-dark/70';
+                    p.innerHTML = `<span class="font-bold">-${dim.label}:</span> ${dim.value}`;
+                    modalProductDimensions.appendChild(p);
+                });
+
+                // Populate image gallery
+                currentImageIndex = 0;
+                updateGalleryImage();
+                populateThumbnails();
+
+                productModal.classList.add('open');
+            }
+
+            /**
+             * Updates the main gallery image and highlights the active thumbnail.
+             */
+            function updateGalleryImage() {
+                if (currentProduct && currentProduct.images && currentProduct.images.length > 0) {
+                    modalGalleryImage.src = currentProduct.images[currentImageIndex];
+                    // Update active thumbnail
+                    document.querySelectorAll('.thumbnail').forEach((thumb, index) => {
+                        if (index === currentImageIndex) {
+                            thumb.classList.add('border-secondary', 'border-2');
+                            thumb.classList.remove('border-gray-300');
+                            thumb.scrollIntoView({ behavior: 'smooth', inline: 'center' }); // Scroll active thumbnail into view
+                        } else {
+                            thumb.classList.remove('border-secondary', 'border-2');
+                            thumb.classList.add('border-gray-300');
+                        }
+                    });
+                } else {
+                    modalGalleryImage.src = 'https://placehold.co/600x400/CCCCCC/666666?text=No+Image'; // Fallback
+                }
+
+                // Hide/show navigation buttons based on image count
+                prevImageBtn.style.display = currentProduct.images.length > 1 ? 'block' : 'none';
+                nextImageBtn.style.display = currentProduct.images.length > 1 ? 'block' : 'none';
+            }
+
+            /**
+             * Populates the thumbnail gallery for the current product.
+             */
+            function populateThumbnails() {
+                modalThumbnails.innerHTML = '';
+                if (currentProduct && currentProduct.images && currentProduct.images.length > 1) {
+                    currentProduct.images.forEach((imgSrc, index) => {
+                        const thumbnail = document.createElement('img');
+                        thumbnail.src = imgSrc;
+                        thumbnail.alt = `Thumbnail ${index + 1}`;
+                        thumbnail.className = 'thumbnail w-20 h-16 object-cover rounded-md cursor-pointer border border-gray-300 hover:border-secondary transition-colors';
+                        thumbnail.addEventListener('click', () => {
+                            currentImageIndex = index;
+                            updateGalleryImage();
+                        });
+                        modalThumbnails.appendChild(thumbnail);
+                    });
+                }
+            }
+
+            // Event listeners for gallery navigation
+            prevImageBtn.addEventListener('click', () => {
+                if (currentProduct && currentProduct.images) {
+                    currentImageIndex = (currentImageIndex - 1 + currentProduct.images.length) % currentProduct.images.length;
+                    updateGalleryImage();
+                }
+            });
+
+            nextImageBtn.addEventListener('click', () => {
+                if (currentProduct && currentProduct.images) {
+                    currentImageIndex = (currentImageIndex + 1) % currentProduct.images.length;
+                    updateGalleryImage();
+                }
+            });
+
+            // Close modal functionality
+            closeButton.addEventListener('click', () => {
+                productModal.classList.remove('open');
+            });
+
+            // Close modal when clicking outside the content
+            productModal.addEventListener('click', (event) => {
+                if (event.target === productModal) {
+                    productModal.classList.remove('open');
+                }
+            });
         });
     </script>
 </body>
